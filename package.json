@@ -1,0 +1,39 @@
+{
+  "name": "env-tmp",
+  "version": "1.0.5",
+  "description": "Functions Env tmp Manager With Folder Temporary",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    ".env",
+    "tmp",
+    "env",
+    "environment",
+    "variables",
+    "temp",
+    "temporary",
+    "backup",
+    "config",
+    "configuration",
+    "revert",
+    "restore",
+    "dotenv",
+    "set",
+    "unset",
+    "delete",
+    "file",
+    "management",
+    "utility"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hzvvictor/env-tmp.git"
+  },
+  "author": "Victor Manuel Hernandez Vargas",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.3.1"
+  }
+}
