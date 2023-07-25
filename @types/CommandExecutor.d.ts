@@ -1,13 +1,13 @@
-/// <reference types="node" />
-import { SpawnOptions } from 'child_process';
 declare class CommandExecutor {
-    private strict;
-    constructor(strict?: boolean);
+    private commands;
+    private cwd;
+    constructor({ commands, cwd }: {
+        commands: string[];
+        cwd?: string;
+    });
+    private findCommandPath;
+    executeCommands(): Promise<void>;
     private executeCommand;
-    executeCommands(commands: Array<{
-        command: string;
-        args: string[];
-        options?: SpawnOptions;
-    }>): Promise<void>;
+    private getSpawnOptions;
 }
 export default CommandExecutor;

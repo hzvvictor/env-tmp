@@ -1,6 +1,6 @@
 {
   "name": "env-tmp",
-  "version": "1.0.5",
+  "version": "1.0.8",
   "description": "Functions Env tmp Manager With Folder Temporary",
   "main": "index.js",
   "scripts": {
@@ -34,6 +34,8 @@
   "author": "Victor Manuel Hernandez Vargas",
   "license": "ISC",
   "dependencies": {
-    "dotenv": "^16.3.1"
-  }
+    "dotenv": "^16.3.1",
+    "which": "^3.0.1"
+  },
+  "typings": "@types"
 }

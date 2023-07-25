@@ -33,10 +33,12 @@ This function backs up the current .env file, generates a new one from the provi
 This function restores the original .env file from the temporary backup and deletes the temporary directory.
 
 ### `executeWithTempDotenv()`
-You can use executeWithTempDotenv function to execute commands with different environment configurations. Here are some examples:
+#### import
 ```javascript
 import { executeWithTempDotenv } from 'env-tmp';
 ```
+The `executeWithTempDotenv()` function provides a convenient way to execute commands with different environment configurations, especially for Node.js and npm commands. This function also allows you to execute other executable files using custom environment variables. Here are some examples of how to use it:
+- Executing npm run dev with custom environment configurations:
 ```javascript
 // Example 1: Using 'npm run dev'
 const devConfig = {
@@ -44,24 +46,27 @@ const devConfig = {
   PORT: 3000,
   // Add more environment variables specific to 'npm run dev'
 };
-const devCommand = { command: 'npm', args: ['run', 'dev'] };
+const devCommand ='npm run dev';
 executeWithTempDotenv(devConfig, devCommand);
 ```
+- Executing npm test with custom environment configurations:
 ```javascript
 // Example 2: Using 'npm test'
 const testConfig = {
   NODE_ENV: 'test',
   // Add more environment variables specific to 'npm test'
 };
-const testCommand = { command: 'npm', args: ['test'] };
+const testCommand = 'npm test';
 executeWithTempDotenv(testConfig, testCommand);
 ```
+- Executing other executables with custom environment configurations:
 ```javascript
 // Example 3: Using 'node' with a specific file 
-executeWithTempDotenv({ LOGGING_QUERIES: false }, {
-  command: 'node',
-  args: ['./src/app.js']
-})
+executeWithTempDotenv(
+  { LOGGING_QUERIES: false }, 
+  'node ./src/app.js',
+  //other commands
+)
 ```
 ## Note:
 - The .env file should exist in the root of your project.

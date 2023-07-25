@@ -1,18 +1,16 @@
 type DotenvConfig = {
     [key: string]: string;
 };
-type Command = {
-    command: string;
-    args: string[];
-    options?: import('child_process').SpawnOptions;
-};
-declare const setConfig: (obj: DotenvConfig, nameBackupTmp?: '') => void;
-declare const revertConfig: () => void;
+type Command = string;
+declare const setShowLogs: (showLogs?: boolean) => boolean;
+declare const setConfig: (obj: DotenvConfig, nameBackupTmp?: string) => void;
+declare const revertConfig: (nameBackupTmp?: string) => void;
 declare const executeWithTempDotenv: (obj: DotenvConfig, ...commands: Command[]) => Promise<void>;
 declare const _default: {
-    setConfig: (obj: DotenvConfig, nameBackupTmp?: "" | undefined) => void;
-    revertConfig: () => void;
-    executeWithTempDotenv: (obj: DotenvConfig, ...commands: Command[]) => Promise<void>;
+    setShowLogs: (showLogs?: boolean) => boolean;
+    setConfig: (obj: DotenvConfig, nameBackupTmp?: string) => void;
+    revertConfig: (nameBackupTmp?: string) => void;
+    executeWithTempDotenv: (obj: DotenvConfig, ...commands: string[]) => Promise<void>;
 };
 export default _default;
-export { setConfig, revertConfig, executeWithTempDotenv };
+export { setShowLogs, setConfig, revertConfig, executeWithTempDotenv };

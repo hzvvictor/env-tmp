@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.executeWithTempDotenv = exports.revertConfig = exports.setConfig = void 0;
+exports.executeWithTempDotenv = exports.revertConfig = exports.setConfig = exports.setShowLogs = void 0;
 const dotenv_1 = __importDefault(require("dotenv"));
 const VARIABLES = dotenv_1.default.config().parsed || {};
 const fs_1 = __importDefault(require("fs"));
@@ -58,33 +58,44 @@ const verifyPath = (nameBackupTmp) => {
         throw `Already exists '.env' in '${path}/${nameBackupTmp}'`;
     return true;
 };
-const setConfig = (obj, nameBackupTmp) => {
+const config = { showLogs: true };
+const message = {
+    backup: '\x1b[90mEnvironment variables backed up successfully. \x1b[0m\x1b[32m✔\x1b[0m',
+    restore: '\x1b[90mEnvironment variables restored successfully. \x1b[0m\x1b[32m✔\x1b[0m'
+};
+const messageSucess = (msgtype) => config.showLogs && console.log(message[msgtype]);
+const setShowLogs = (showLogs = false) => config.showLogs = showLogs;
+exports.setShowLogs = setShowLogs;
+const setConfig = (obj, nameBackupTmp = '') => {
     const fileName = nameBackupTmp || '.env';
     verifyPath(fileName);
-    moveFile('.env', './tmp/.env');
+    moveFile('.env', `./tmp/${fileName}`);
     const envText = generateEnvText(obj);
     fs_1.default.writeFileSync('.env', envText);
-    console.log('\x1b[90mEnvironment variables backed up successfully. ✔');
+    messageSucess('backup');
 };
 exports.setConfig = setConfig;
-const revertConfig = () => {
+const revertConfig = (nameBackupTmp = '') => {
+    const fileName = nameBackupTmp || '.env';
+    const filePath = `./tmp/${fileName}`;
     const existEnv = fs_1.default.existsSync('.env');
-    const existEnvTmp = fs_1.default.existsSync('./tmp/.env');
+    const existEnvTmp = fs_1.default.existsSync(filePath);
     if (!existEnvTmp)
-        throw `File './tmp/.env' not found`;
-    moveFile('./tmp/.env', '.env');
+        throw `File '${filePath}' not found`;
+    moveFile(filePath, '.env');
     deleteEmptyDirectory('./tmp');
-    console.log('\x1b[90mEnvironment variables restored successfully. \x1b[0m\x1b[32m✔\x1b[0m');
+    messageSucess('restore');
 };
 exports.revertConfig = revertConfig;
 const executeWithTempDotenv = (obj, ...commands) => __awaiter(void 0, void 0, void 0, function* () {
     setConfig(obj);
-    const executor = new CommandExecutor_1.default(true);
-    yield executor.executeCommands(commands);
+    const executor = new CommandExecutor_1.default({ commands: commands });
+    yield executor.executeCommands();
     revertConfig();
 });
 exports.executeWithTempDotenv = executeWithTempDotenv;
 exports.default = {
+    setShowLogs,
     setConfig,
     revertConfig,
     executeWithTempDotenv

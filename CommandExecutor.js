@@ -8,43 +8,49 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const child_process_1 = require("child_process");
+const which_1 = __importDefault(require("which"));
 class CommandExecutor {
-    constructor(strict = false) {
-        this.strict = strict;
+    constructor({ commands, cwd = process.cwd() }) {
+        this.commands = commands;
+        this.cwd = cwd;
     }
-    executeCommand(command, args, options) {
+    findCommandPath(command) {
+        return (0, which_1.default)(command);
+    }
+    executeCommands() {
+        return __awaiter(this, void 0, void 0, function* () {
+            for (const command of this.commands) {
+                const splitCommand = command.split(/\s+/g);
+                const commandPath = yield this.findCommandPath(splitCommand[0]);
+                yield this.executeCommand(commandPath, splitCommand.slice(1));
+            }
+        });
+    }
+    executeCommand(commandPath, args) {
         return __awaiter(this, void 0, void 0, function* () {
             return new Promise((resolve, reject) => {
-                console.log('  Executing command:', command, args);
-                const childProcess = (0, child_process_1.spawn)(command, args, Object.assign({ stdio: 'inherit' }, options));
+                const childProcess = (0, child_process_1.spawn)(commandPath, args, this.getSpawnOptions());
                 childProcess.on('error', (error) => {
-                    reject(new Error(`Error executing command ${command}: ${error.message}`));
+                    reject(`Error executing command: ${error.message}`);
                 });
                 childProcess.on('exit', (code) => {
                     if (code === 0) {
-                        // console.log(`Command ${command} executed successfully`);
                         resolve();
                     }
                     else {
-                        reject(new Error(`Error executing command ${command}. Exit code: ${code}`));
+                        reject(`Command execution failed with exit code: ${code}`);
                     }
                 });
             });
         });
     }
-    executeCommands(commands) {
-        return __awaiter(this, void 0, void 0, function* () {
-            for (const { command, args, options } of commands) {
-                yield this.executeCommand(command, args, options).catch((error) => {
-                    console.error(error.message);
-                    if (this.strict) {
-                        process.exit(1);
-                    }
-                });
-            }
-        });
+    getSpawnOptions() {
+        return { cwd: this.cwd, stdio: 'inherit' };
     }
 }
 exports.default = CommandExecutor;
