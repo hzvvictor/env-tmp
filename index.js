@@ -18,6 +18,9 @@ const VARIABLES = dotenv_1.default.config().parsed || {};
 const fs_1 = __importDefault(require("fs"));
 const CommandExecutor_1 = __importDefault(require("./CommandExecutor"));
 const dirTmp = { exist: false };
+const wait = (ms) => new Promise(resolve => {
+    setTimeout(resolve, ms);
+});
 const deleteFile = (filePath) => {
     fs_1.default.unlink(filePath, (error) => {
         if (error)
@@ -75,23 +78,36 @@ const setConfig = (obj, nameBackupTmp = '') => {
     messageSucess('backup');
 };
 exports.setConfig = setConfig;
-const revertConfig = (nameBackupTmp = '') => {
-    const fileName = nameBackupTmp || '.env';
-    const filePath = `./tmp/${fileName}`;
-    const existEnv = fs_1.default.existsSync('.env');
-    const existEnvTmp = fs_1.default.existsSync(filePath);
-    if (!existEnvTmp)
-        throw `File '${filePath}' not found`;
-    moveFile(filePath, '.env');
-    deleteEmptyDirectory('./tmp');
-    messageSucess('restore');
-};
+const revertConfig = (nameBackupTmp = '') => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const fileName = nameBackupTmp || '.env';
+        const filePath = `./tmp/${fileName}`;
+        const existEnvTmp = fs_1.default.existsSync(filePath);
+        if (!existEnvTmp)
+            return;
+        yield moveFile(filePath, '.env');
+        yield deleteEmptyDirectory('./tmp');
+        messageSucess('restore');
+        return 'restore';
+    }
+    catch (error) {
+        throw error;
+    }
+});
 exports.revertConfig = revertConfig;
 const executeWithTempDotenv = (obj, ...commands) => __awaiter(void 0, void 0, void 0, function* () {
-    setConfig(obj);
-    const executor = new CommandExecutor_1.default({ commands: commands });
-    yield executor.executeCommands();
-    revertConfig();
+    const config = { moved: false };
+    try {
+        setConfig(obj);
+        yield wait(100);
+        config.moved = true;
+        const executor = new CommandExecutor_1.default({ commands: commands });
+        yield executor.executeCommands();
+    }
+    catch (error) {
+    }
+    if (config.moved)
+        revertConfig();
 });
 exports.executeWithTempDotenv = executeWithTempDotenv;
 exports.default = {
